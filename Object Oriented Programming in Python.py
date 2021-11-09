@@ -1,6 +1,9 @@
 
 """  Python Object-Oriented Programming
 
+Source:- https://www.youtube.com/watch?v=BJ-VvGyQxho&list=PL-osiE80TeTsqhIuOqKhwlXsIBIdSeYtc&index=2
+
+
 1. Why should we even use classes?
 Because it allows us to logically group our data and functions in a way that is easy to
 reuse and also easy to build upon if need be.
@@ -96,5 +99,141 @@ empl2 = employee('Test','User',60000)       ## Also 'self' argument is not neede
 print(empl1.fullname()) ## Here we accessed the 'fullname()' method...but notice that while accessing method, we are giving parathesis '()' because its not an attribute.
                         ## If we print the method as 'print(fullname)' without parenthesis '()', then it will simply display the method but not the returned value by the method.
 
-print(employee.fullname(empl1))
+print(employee.fullname(empl1)) # IN THIS WAY ALSO WE CAN ACCESS THE METHOD. IN THIS, WE HAVE USED CLASS NAME AND THE METHOD TO BE EXECUTED AND WITHIN THE ARGUMENT OF THAT METHOD
+                                # WE HAVE PROVIDED INSTANCE NAME (like 'empl1' here).
 
+
+
+###________________________________________________________________________________________________________________________________
+
+""" INSTANCE VARIABLES VS CLASS VARIABLES
+
+## Instance variables are used for data that is unique to each instance. These are set using 'self' argument. For eg. self.first_name, self.last_name these are set for each instance of each employee we create.
+
+## Class variables are variables that are shared among all instances of a class. Class variables are same foe each instance."""
+
+## Eg.
+
+class employee:
+
+    raise_amount = 1.04   # Created a class variable
+    num_of_emps = 0       # Created another class variable for counting the number of instances
+
+    def __init__(self,pay):
+        self.pay = pay
+        employee.num_of_emps += 1  ## Since everytime this __init__() method gets executed as we create new instances.
+        ## Therefore, for each instance num_of_emps attribute must be incremented by 1 
+
+    def apply_raise(self):
+        self.pay = self.pay * self.raise_amount   ## or we can apply "employee.raise_amount"
+        ## Whenever we access the class variable,we need to access them either from class itself or an instance of the class
+e1 = employee(50000)
+e2 = employee(60000)
+
+        ## Now if we print the raise_amount as:
+print(employee.raise_amount)
+print(e1.raise_amount)
+print(e2.raise_amount)
+
+## Then we'll be getting the output as:-
+#> 1.04
+#> 1.04
+#> 1.04
+
+## Now if we modify the raise_amount variable to 1.05 as :-
+
+employee.raise_amount = 1.05
+# and now if I again print raise_amount :-
+print(employee.raise_amount)
+print(e1.raise_amount)
+print(e2.raise_amount)
+
+## Then we'll be getting the output as:-
+#> 1.05
+#> 1.05
+#> 1.05
+
+## So we found that it changed the value of raise_amount variable for class and all of the instance.
+
+## If we set the value of raise_amount variable by using instance instead of using a class. This will be done as:-
+
+e1.raise_amount = 1.05
+# and now if I again print raise_amount :-
+print(employee.raise_amount)
+print(e1.raise_amount)
+print(e2.raise_amount)
+
+## Then we'll be getting the output as:-
+#> 1.04
+#> 1.05
+#> 1.04     ## Since we didn't set the raise_amount value equal to 1.05 to instance e2 therefore it is 1.04 by default
+
+## Now lets display the no. of instances created
+print(employee.num_of_emps)
+
+###__________________________________________________________________________________________________________________________________
+
+""" Regular methods, Class methods and Static methods
+
+Regular methods automatically take instance as its first argument and by convention we call it 'self'.
+
+In order to take class as its first argument, we use class methods. This begins by adding a DECORATOR '@classmethod' on top of any method to work as a class method."""
+
+## For example:-
+
+class Employee:
+    num_of_emps = 0
+    raise_amount = 1.05
+
+    def __init__(self, first, last, pay):
+        self.first = first
+        self.last = last
+        self.pay = pay
+        self.email = first + '.'+ last + '@email.com'
+
+        Employee.num_of_emps += 1
+
+    def fullname(self):
+        return '{} {}'.format(self.first,self.last)
+
+    def apply_raise(self):
+        self.pay = int(self.pay * self.raise_amount)
+
+    @classmethod  ## Created one decorator '@classmethod' and making below method as class method. This alters the method as it will receive class as first argument
+    def set_raise_amount(cls, amount):
+        cls.raise_amount = amount    # this is same as we assign Employee.raise_amount = 1.05
+
+
+emp1 = Employee('Corey','Schafer',50000)
+emp2 = Employee('Test','Employee',60000)
+
+print(Employee.raise_amount)
+print(emp1.raise_amount)
+print(emp2.raise_amount)
+
+## This will give us output as:-
+# 1.04
+# 1.04
+# 1.04
+
+## for modifying the class variable 'raise_amount', either we can do :-
+Employee.set_raise_amount(1.05)
+# and now if we execute print(Employee.raise_amount), print(emp1.raise_amount) and print(emp2.raise_amount), we'll get the output as :-
+# 1.05
+# 1.05
+# 1.05
+
+### RUNNING CLASS METHODS FROM INSTANCES
+
+## If i do :-
+emp1.set_raise_amount(1.05)
+
+#And now if I execute :-
+print(Employee.raise_amount)
+print(emp1.raise_amount)
+print(emp2.raise_amount)
+
+# Then we'll get the output as:-
+# 1.05
+# 1.05
+# 1.05
