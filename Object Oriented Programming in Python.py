@@ -237,3 +237,75 @@ print(emp2.raise_amount)
 # 1.05
 # 1.05
 # 1.05
+
+"""Class methods can be used as an alternative constuctor"""
+
+# For examplve, we have one string consisting of name and pay separated with '-' as 'Corey-Schafer-50000', then either we can separate them 
+# using .split() method outside the class while creating instances.
+# 
+# But here we are focussing on using class methods to work as an alternative constructor or 
+# we can say it will allow us to create instances using class methods without declaring instaces outside the class:-
+class Employee:
+    num_of_emps = 0
+    raise_amount = 1.05
+
+    def __init__(self, first, last, pay):
+        self.first = first
+        self.last = last
+        self.pay = pay
+        self.email = first + '.'+ last + '@email.com'
+
+        Employee.num_of_emps += 1
+
+    def fullname(self):
+        return '{} {}'.format(self.first,self.last)
+
+    def apply_raise(self):
+        self.pay = int(self.pay * self.raise_amount)
+
+#________________________________________________________________________________________________________________
+# Declaring static method
+#       
+# Static method don't pass instance or class in their argument automatically. They behave just like a regular method
+# except we include them in classes because they have some logical connection with the class.
+# 
+# The decorator used for static method is '@staticmethod'
+# For eg. lets say we want to get check whether the weekday is Sunday (0) or Saturday(6)                                                                                                          |
+    
+    @staticmethod
+    def is_weekday(day):
+        if(day.weekday()==0 or day.weekday()==6):
+            return True
+        return False
+#___________________________________________________________________________________________________________________                                                                                                                |
+
+    @classmethod  
+    def set_raise_amount(cls, amount):
+        cls.raise_amount = amount    
+
+    @classmethod
+    def from_string(cls, strings):
+        first, last, pay = strings.split('-')
+        return cls(first, last, pay)        # This line create a new instance (or object) and will return values so that this instance get received
+
+
+## Now we can simply run it as :-
+
+emp1 = Employee.from_string('Corey-Schafer-50000')
+
+## And now if I print email and pay
+print(emp1.email)
+print(emp1.pay)
+
+## We'll get the output as:- 
+# Corey.Schafer@email.com
+# 50000
+
+## Executing static method
+
+import datetime
+my_date = datetime.date(2016,7,10)
+print(Employee.is_weekday(my_date))
+
+# We'll get the output as:-
+True
