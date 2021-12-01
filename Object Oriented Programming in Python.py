@@ -308,4 +308,253 @@ my_date = datetime.date(2016,7,10)
 print(Employee.is_weekday(my_date))
 
 # We'll get the output as:-
-True
+# True
+
+#________________________________________________________________________________________________________________
+
+# Inheritance and creating subclasses
+
+# Inheritance allow us to inherit methods and attributes from a parent class.
+# This is useful because we can create subclasses and get all of the functionality of our parent class and we can override or add completely new functionality without affecting the parent class in any way.
+
+## Lets understand with an example :-
+
+class Employee:
+    raise_amount = 1.04
+
+    def __init__(self, first, last, pay):
+        self.first = first
+        self.last = last
+        self.pay = pay
+        self.email = first + '.'+ last + '@email.com'
+
+    def fullname(self):
+        return '{} {}'.format(self.first,self.last)
+
+    def apply_raise(self):
+        self.pay = int(self.pay * self.raise_amount)
+
+# Till now we worked on class 'Employee'. Lets create class 'Developer' and 'Manager'
+
+# Since both those classes will also be having name and pay. They will also having same parameter which we currently have in class 'Employee' such as 'first', 'last' and 'pay')
+# So instead of copying those code into subclass 'Developer' and 'Manager' again, we can reuse that code by inheriting from class 'Employee'.
+
+#Lets create subclass 'Developer' and 'Manager'
+
+class Developer(Employee):          # Inside parenthesis we provide the class which we want to inherit from.
+    pass            # Keeping it empty for a while
+
+# Creating instances from parent class 'Employee'
+dev1 = Employee('Corey','Schafer',50000)
+dev2 = Employee('Test','Employee',50000)
+
+# If we execute below lines
+print(dev1.email)
+print(dev1.pay)
+
+## We'll get the output as:- 
+# Corey.Schafer@email.com
+# 50000
+
+# Now if we create instances from subclass 'Developer'
+dev1 = Developer('Corey','Schafer',50000)
+dev2 = Developer('Test','Employee',50000)
+# If we execute below lines
+print(dev1.email)
+print(dev1.pay)
+## We'll again get the output as:- 
+# Corey.Schafer@email.com
+# 50000
+
+# Thats because 'Developer' subclass has inherited parent class 'Employee' and now subclass 'Developer' has access to all the attributes and methods of parent class 'Employee'.
+# In the above example, when we instantiated class 'Developer', it first searches for __init__() method and if it doesn't find then it moves towards inheritance chain (also known as 'Method Resolutionator' until it find that __init__() method.
+
+""" For better clarity, we use help() function as :-
+    print(help(Developer))
+"""
+#### Lets get to another example
+
+class Employee:
+    raise_amount = 1.04
+
+    def __init__(self, first, last, pay):
+        self.first = first
+        self.last = last
+        self.pay = pay
+        self.email = first + '.'+ last + '@email.com'
+
+    def fullname(self):
+        return '{} {}'.format(self.first,self.last)
+
+    def apply_raise(self):
+        self.pay = int(self.pay * self.raise_amount)
+
+class Developer(Employee):
+    raise_amount = 1.10
+
+# Lets create an instance of parent class 'Employee'
+dev1 = Employee('Corey','Schafer',50000)
+
+print(dev1.pay)
+dev1.apply_raise()
+print(dev1.pay)
+
+# if we print the above lines, we'll get the output as :-
+# 50000
+# 52000
+
+# And now lets use subclass 'Developer' in place of class 'Employee'
+dev1 = Developer('Corey','Schafer',50000)
+
+# And now if we run below lines:- 
+print(dev1.pay)
+dev1.apply_raise()
+print(dev1.pay)
+
+# We'll get the output as:-
+# 50000
+# 55000
+
+# But again if we run:-
+dev1 = Employee('Corey','Schafer',50000)
+print(dev1.pay)
+dev1.apply_raise()
+print(dev1.pay)
+
+# We'll get the output:-
+# 50000
+# 52000
+
+""" That's because changing any attribute in the subclass doesn't have any effect on the main class"""
+
+"""Sometimes we want to initiate our subclass with more information than the parent class can handle"""
+## For Example, let's say we have our class as:-
+class Employee:
+    raise_amount = 1.04
+
+    def __init__(self, first, last, pay):
+        self.first = first
+        self.last = last
+        self.pay = pay
+        self.email = first + '.'+ last + '@email.com'
+
+    def fullname(self):
+        return '{} {}'.format(self.first,self.last)
+
+    def apply_raise(self):
+        self.pay = int(self.pay * self.raise_amount)
+
+class Developer(Employee):
+    raise_amount = 1.10
+
+dev1 = Developer('Corey','Schafer',50000)
+dev2 = Developer('Test','Employee',60000)
+
+# Like here we created instance of subclass 'Developer'...
+# Sometimes we are required to provide more attribute to subclass more than the parent class
+# Like in the above example, now what if we want to provide more attribute in this subclass lets say we want to provide 'prog_lan' as our next attribute
+
+## So this is done by providing 'Developer' subclass it's own  __init__() method.
+
+class Employee:
+    raise_amount = 1.04
+
+    def __init__(self, first, last, pay):
+        self.first = first
+        self.last = last
+        self.pay = pay
+        self.email = first + '.'+ last + '@email.com'
+
+    def fullname(self):
+        return '{} {}'.format(self.first,self.last)
+
+    def apply_raise(self):
+        self.pay = int(self.pay * self.raise_amount)
+
+class Developer(Employee):
+    raise_amount = 1.10
+
+    def __init__(self, first, last, pay, prog_lan):
+
+## Here instead of declaring these variables which are already their inside parent class like below:-        
+        """self.first = first
+        self.last = last
+        self.pay = pay
+        self.email = first + '.'+ last + '@email.com'"""
+    
+# what we do is we do super().__init__(first, last, pay)....This lets the parent class Employee's __init__() method to handle the attribues of the parent class i.e first, last and pay
+
+## So here it is done as:-
+        super().__init__(first, last, pay)  ## Employee.__init__(self, first, last, pay)....both of these are same
+        self.prog_lan = prog_lan
+
+## now if I create instance for the subclass as:-
+
+dev1 = Developer('Corey','Schafer',50000,'Java')        ## Here, we'll be required to provide one more attribute as we have provided the subclass 'Developer' for one extra attribute to be used
+dev2 = Developer('Test','Employee',60000,'Python')
+
+#now if I print them as:-
+print(dev1.email)
+print(dev1.prog_lan)
+
+## We'll get the output as:-
+
+# Corey.Schafer@email.com
+# Java
+
+class Employee:
+    raise_amount = 1.04
+
+    def __init__(self, first, last, pay):
+        self.first = first
+        self.last = last
+        self.pay = pay
+        self.email = first + '.'+ last + '@email.com'
+
+    def fullname(self):
+        return '{} {}'.format(self.first,self.last)
+
+    def apply_raise(self):
+        self.pay = int(self.pay * self.raise_amount)
+
+class Developer(Employee):
+    raise_amount = 1.10
+
+    def __init__(self, first, last, pay, prog_lan):
+        super().__init__(first, last, pay)  
+        self.prog_lan = prog_lan
+
+class Manager(Employee):
+    def __init__(self, first, last, pay, employes=None):
+        super().__init__(first, last, pay)
+        if employes is None:
+            self.employes = []
+        else:
+            self.employes = employes
+
+    def add_emp(self,emp):
+        if emp not in self.employes:
+            self.employes.append(emp)
+
+    def remove_emp(self, emp):
+        if emp in self.employes:
+            self.employes.remove(emp)
+
+    def print_emps(self):
+        for emp in self.employes:
+            print('--->',emp.fullname())
+        
+dev1 = Developer('Corey','Schafer',50000,'Java')        
+dev2 = Developer('Test','Employee',60000,'Python')
+
+mgr1 = Manager('Sue', 'Smith', 90000, [dev1])
+print(mgr1.email)
+
+mgr1.add_emp(dev2)
+mgr1.remove_emp(dev1)
+mgr1.print_emps()
+
+# O/P
+
+# Sue.Smith@email.com
+# ---> Test Employee
