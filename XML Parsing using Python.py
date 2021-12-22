@@ -9,23 +9,62 @@ root = tree.getroot()
 
 print(root.tag, root.attrib, root[0].attrib,root[0].get('id'))
 
+## O/P:-
+# catalog {} {'id': 'bk101'} bk101
+
 ## tag -> returns current tag name
 ## attrib ->    returns attribute of current element in dictionary format i.e in key-value pair
 ## get('id) ->     returns value of attribute of current element
 print(root[0].tag, root[0].attrib)
-print(root[0][1].tag, root[0][1].attrib, root[0][1].text)
+# O/P:-
+# book {'id': 'bk101'}
 
+print(root[0][1].tag, root[0][1].attrib, root[0][1].text)
+# O/P:-
+# title {} XML Developer's Guide
 for child in root:
     print("sub node:-{}".format(child.tag),"\t\t","sub node attribute:-{}".format(child.attrib))
 
+# O/P:-
+# sub node:-book           sub node attribute:-{'id': 'bk101'}
+# sub node:-book           sub node attribute:-{'id': 'bk102'}
+# sub node:-book           sub node attribute:-{'id': 'bk103'}
+# sub node:-book           sub node attribute:-{'id': 'bk104'}
+# sub node:-book           sub node attribute:-{'id': 'bk105'}
+# sub node:-book           sub node attribute:-{'id': 'bk106'}
+# sub node:-book           sub node attribute:-{'id': 'bk107'}
+# sub node:-book           sub node attribute:-{'id': 'bk108'}
+# sub node:-book           sub node attribute:-{'id': 'bk109'}
+
 for child in root[0]:
     print("sub node:-{}".format(child.tag),"\t\t","sub node attribute:-{}".format(child.attrib))
+
+# O/P:-
+# sub node:-author                 sub node attribute:-{}
+# sub node:-title                  sub node attribute:-{}
+# sub node:-genre                  sub node attribute:-{}
+# sub node:-price                  sub node attribute:-{}
+# sub node:-publish_date           sub node attribute:-{}
+# sub node:-description            sub node attribute:-{}
 
 for i in root.findall('book'):
     author = i.find('author').text
     price = i.find('price').text
     print(author,price)
 
+# O/P:-
+# Gambardella, Matthew 44.95
+# Ralls, Kim 5.95
+# Corets, Eva 5.95
+# Corets, Eva 5.95
+# Corets, Eva 5.95
+# Randall, Cynthia 4.95
+# Thurman, Paula 4.95
+# Knorr, Stefan 4.95
+# Kress, Peter 6.95
+# O'Brien, Tim 36.95
+# O'Brien, Tim 36.95
+# Galos, Mike 49.95
 
 for i in root.iter('genre'):        ## Iterating over all 'genre' tags
     a = str(i.text)+'New description added'     ## Edited description
@@ -81,4 +120,6 @@ tree.write('sample5.xml')
 ## Finding element by selecting nodes by path as:-
 find_ele = root.find(".//book[@id='bk103']")
 
-print(find_ele.text)
+print(find_ele.text)  
+
+## No O/P since no text is there
