@@ -929,3 +929,181 @@ select sell_date, count(distinct product) as num_sold, string_agg(product,',') W
 from (select distinct * from Activities) x
 group by sell_date
 order by 1
+
+/*
+HARD:
+
+Amazon Web Services (AWS) is powered by fleets of servers. Senior management has requested data-driven solutions to optimize server usage.
+
+Write a query that calculates the total time that the fleet of servers was running. The output should be in units of full days.
+
+Assumptions:
+
+Each server might start and stop several times.
+The total time in which the server fleet is running can be calculated as the sum of each server's uptime.
+server_utilization Table:
+Column Name	Type
+server_id	integer
+status_time	timestamp
+session_status	string
+server_utilization Example Input:
+server_id	status_time	session_status
+1	08/02/2022 10:00:00	start
+1	08/04/2022 10:00:00	stop
+2	08/17/2022 10:00:00	start
+2	08/24/2022 10:00:00	stop
+Example Output:
+total_uptime_days
+21
+Explanation
+In the example output, the combined uptime of all the servers (from each start time to stop time) totals 21 full days.
+*/
+
+--Solution 1-
+
+with cte as 
+(
+select *, lead(t.status_time) over (partition by t.server_id)  as stop_time
+from
+(select *
+from server_utilization
+order by server_id,status_time) t)
+
+select sum(extract(days from stop_time) - extract(days from status_time)) as total_uptime_days 
+from cte 
+where session_status = 'start'
+
+--Solution 2-
+
+with cte as (
+select *, 
+row_number() over(partition by server_id order by status_time) as row_seq
+from server_utilization)
+
+select sum(cast(c2.status_time as date) - cast(c1.status_time as date)) as total_uptime_days --, c1.row_seq 
+from cte c1
+join cte c2
+on c1.row_seq +1 = c2.row_seq and c1.server_id = c2.server_id
+where c1.row_seq%2 =1
+
+/*Table: Insurance
+
++-------------+-------+
+| Column Name | Type  |
++-------------+-------+
+| pid         | int   |
+| tiv_2015    | float |
+| tiv_2016    | float |
+| lat         | float |
+| lon         | float |
++-------------+-------+
+pid is the primary key (column with unique values) for this table.
+Each row of this table contains information about one policy where:
+pid is the policyholder's policy ID.
+tiv_2015 is the total investment value in 2015 and tiv_2016 is the total investment value in 2016.
+lat is the latitude of the policy holder's city. It's guaranteed that lat is not NULL.
+lon is the longitude of the policy holder's city. It's guaranteed that lon is not NULL.
+ 
+
+Write a solution to report the sum of all total investment values in 2016 tiv_2016, for all policyholders who:
+
+have the same tiv_2015 value as one or more other policyholders, and
+are not located in the same city as any other policyholder (i.e., the (lat, lon) attribute pairs must be unique).
+Round tiv_2016 to two decimal places.
+
+The result format is in the following example.
+
+ 
+
+Example 1:
+
+Input: 
+Insurance table:
++-----+----------+----------+-----+-----+
+| pid | tiv_2015 | tiv_2016 | lat | lon |
++-----+----------+----------+-----+-----+
+| 1   | 10       | 5        | 10  | 10  |
+| 2   | 20       | 20       | 20  | 20  |
+| 3   | 10       | 30       | 20  | 20  |
+| 4   | 10       | 40       | 40  | 40  |
++-----+----------+----------+-----+-----+
+Output: 
++----------+
+| tiv_2016 |
++----------+
+| 45.00    |
++----------+
+Explanation: 
+The first record in the table, like the last record, meets both of the two criteria.
+The tiv_2015 value 10 is the same as the third and fourth records, and its location is unique.
+
+The second record does not meet any of the two criteria. Its tiv_2015 is not like any other policyholders and its location is the same as the third record, which makes the third record fail, too.
+So, the result is the sum of tiv_2016 of the first and last record, which is 45.
+*/
+
+select round(sum(tiv_2016)*1.00,2) as tiv_2016
+from Insurance
+where tiv_2015 in(
+select tiv_2015
+from Insurance
+group by tiv_2015
+having count(tiv_2015) > 1)
+and concat(cast(lat as varchar), cast(lon as varchar)) in 
+    (select concat(cast(lat as varchar), cast(lon as varchar)) 
+    from Insurance 
+    group by concat(cast(lat as varchar), cast(lon as varchar)) 
+    having count(concat(cast(lat as varchar), cast(lon as varchar)))=1)
+
+/*Table: Transactions
+
++---------------+---------+
+| Column Name   | Type    |
++---------------+---------+
+| id            | int     |
+| country       | varchar |
+| state         | enum    |
+| amount        | int     |
+| trans_date    | date    |
++---------------+---------+
+id is the primary key of this table.
+The table has information about incoming transactions.
+The state column is an enum of type ["approved", "declined"].
+ 
+
+Write an SQL query to find for each month and country, the number of transactions and their total amount, the number of approved transactions and their total amount.
+
+Return the result table in any order.
+
+The query result format is in the following example.
+
+ 
+
+Example 1:
+
+Input: 
+Transactions table:
++------+---------+----------+--------+------------+
+| id   | country | state    | amount | trans_date |
++------+---------+----------+--------+------------+
+| 121  | US      | approved | 1000   | 2018-12-18 |
+| 122  | US      | declined | 2000   | 2018-12-19 |
+| 123  | US      | approved | 2000   | 2019-01-01 |
+| 124  | DE      | approved | 2000   | 2019-01-07 |
++------+---------+----------+--------+------------+
+Output: 
++----------+---------+-------------+----------------+--------------------+-----------------------+
+| month    | country | trans_count | approved_count | trans_total_amount | approved_total_amount |
++----------+---------+-------------+----------------+--------------------+-----------------------+
+| 2018-12  | US      | 2           | 1              | 3000               | 1000                  |
+| 2019-01  | US      | 1           | 1              | 2000               | 2000                  |
+| 2019-01  | DE      | 1           | 1              | 2000               | 2000                  |
++----------+---------+-------------+----------------+--------------------+-----------------------+
+*/
+
+select format(trans_date,'yyyy-MM') as month, country,
+count(id) as trans_count, 
+sum(case when state = 'approved' then 1 else 0 end) as approved_count,
+sum(amount) as trans_total_amount,
+sum(case when state = 'approved' then amount else 0 end) as approved_total_amount
+from Transactions
+group by format(trans_date,'yyyy-MM'), country
